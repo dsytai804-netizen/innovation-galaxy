@@ -2,7 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Mesh } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import { GraphNode, useGraphStore } from '../../stores/useGraphStore';
+import type { GraphNode } from '../../stores/useGraphStore';
+import { useGraphStore } from '../../stores/useGraphStore';
 import { useBasketStore } from '../../stores/useBasketStore';
 import { nodeExpansionService } from '../../services/graph/nodeExpansionService';
 

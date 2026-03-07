@@ -1,4 +1,4 @@
-import { GraphNode } from '../../stores/useGraphStore';
+import type { GraphNode } from '../../stores/useGraphStore';
 import { llmClient } from '../llm/llmClient';
 import { PROMPTS } from '../llm/promptBuilder';
 import { generateChildNodePositions } from '../../utils/sphericalLayout';

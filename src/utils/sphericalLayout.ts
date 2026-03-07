@@ -1,4 +1,4 @@
-import { GraphNode } from '../stores/useGraphStore';
+import type { GraphNode } from '../stores/useGraphStore';
 
 export function generateFibonacciSphere(
   count: number,

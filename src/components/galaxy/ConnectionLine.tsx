@@ -16,7 +16,7 @@ export const ConnectionLine: React.FC<ConnectionLineProps> = ({
   color = '#4A90E2',
   opacity = 0.3,
 }) => {
-  const lineRef = useRef<THREE.Line>(null);
+  const lineRef = useRef<any>(null);
 
   // Animate line opacity
   useFrame(({ clock }) => {
