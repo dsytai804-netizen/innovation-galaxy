@@ -4,6 +4,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useGraphStore } from '../../stores/useGraphStore';
 import { Planet } from './Planet';
 import { ConnectionLine } from './ConnectionLine';
+import { ParticleField } from './ParticleField';
 
 export const GalaxyCanvas: React.FC = () => {
   const loadInitialGraph = useGraphStore((state) => state.loadInitialGraph);
@@ -25,6 +26,9 @@ export const GalaxyCanvas: React.FC = () => {
         <ambientLight intensity={0.3} />
         <pointLight position={[10, 10, 10]} intensity={1} />
         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#4A90E2" />
+
+        {/* Particle Field */}
+        <ParticleField />
 
         {/* Render Planets */}
         {nodes.map((node) => (
