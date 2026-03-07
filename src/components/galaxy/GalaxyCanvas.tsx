@@ -54,26 +54,18 @@ export const GalaxyCanvas: React.FC = () => {
           );
         })}
 
-        {/* Controls */}
+        {/* Controls - 类似VR看房的交互体验 */}
         <OrbitControls
           enableDamping
           dampingFactor={0.05}
-          rotateSpeed={0.5}
-          zoomSpeed={0.8}
-          panSpeed={0.8}
-          enablePan={true}
+          rotateSpeed={0.6}
+          zoomSpeed={1.0}
+          enablePan={false}
           minDistance={10}
           maxDistance={80}
-          // Mac触控板支持
-          touches={{
-            ONE: 2, // 单指旋转 (TOUCH.ROTATE)
-            TWO: 1, // 双指平移 (TOUCH.PAN)
-          }}
-          mouseButtons={{
-            LEFT: 2,  // 鼠标左键旋转 (MOUSE.ROTATE)
-            MIDDLE: 1, // 鼠标中键平移 (MOUSE.PAN)
-            RIGHT: 1,  // 鼠标右键平移 (MOUSE.PAN)
-          }}
+          // 平滑的惯性滚动
+          enableZoom={true}
+          zoomToCursor={false}
         />
 
         {/* Post-processing Effects */}
@@ -86,13 +78,6 @@ export const GalaxyCanvas: React.FC = () => {
           />
         </EffectComposer>
       </Canvas>
-
-      {/* Footer Hint */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
-        <p className="text-xs text-gray-400 whitespace-nowrap">
-          单指旋转 | 双指平移 | 捏合缩放 | 单击展开 | 双击添加
-        </p>
-      </div>
     </div>
   );
 };

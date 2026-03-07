@@ -29,8 +29,22 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
     }
   });
 
-  // Click handler - expand node
-  const handleClick = async (e: any) => {
+  // Click handler - add to basket (按PRD定义)
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+
+    if (!isSelected) {
+      addKeyword({
+        id: node.id,
+        label: node.label,
+        type: node.type === 'core' ? 'technology' : node.type,
+        color: node.color,
+      });
+    }
+  };
+
+  // Double click handler - expand node (按PRD定义)
+  const handleDoubleClick = async (e: any) => {
     e.stopPropagation();
 
     if (node.expanded) {
@@ -51,20 +65,6 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
       alert('节点扩展失败，请检查LLM API配置');
     } finally {
       setIsExpanding(false);
-    }
-  };
-
-  // Double click handler - add to basket
-  const handleDoubleClick = (e: any) => {
-    e.stopPropagation();
-
-    if (!isSelected) {
-      addKeyword({
-        id: node.id,
-        label: node.label,
-        type: node.type === 'core' ? 'technology' : node.type,
-        color: node.color,
-      });
     }
   };
 
