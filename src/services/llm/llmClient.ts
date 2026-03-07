@@ -22,7 +22,8 @@ export class LLMClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${llmConfig.apiKey}`,
+          'x-api-key': llmConfig.apiKey,
+          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
           model: llmConfig.model,
@@ -32,8 +33,7 @@ export class LLMClient {
               content: prompt
             }
           ],
-          temperature: options.temperature ?? 0.7,
-          max_tokens: options.maxTokens ?? 1500,
+          max_tokens: options.maxTokens ?? 4096,
         }),
         signal: AbortSignal.timeout(llmConfig.timeout),
       });
@@ -47,7 +47,7 @@ export class LLMClient {
       const data = await response.json();
 
       return {
-        content: data.choices?.[0]?.message?.content || data.content || '',
+        content: data.content?.[0]?.text || data.content || '',
         usage: data.usage,
       };
     } catch (error) {
