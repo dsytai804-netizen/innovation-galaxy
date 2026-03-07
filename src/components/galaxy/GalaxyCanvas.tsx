@@ -64,6 +64,16 @@ export const GalaxyCanvas: React.FC = () => {
           enablePan={true}
           minDistance={10}
           maxDistance={80}
+          // Mac触控板支持
+          touches={{
+            ONE: 2, // 单指旋转 (TOUCH.ROTATE)
+            TWO: 1, // 双指平移 (TOUCH.PAN)
+          }}
+          mouseButtons={{
+            LEFT: 2,  // 鼠标左键旋转 (MOUSE.ROTATE)
+            MIDDLE: 1, // 鼠标中键平移 (MOUSE.PAN)
+            RIGHT: 1,  // 鼠标右键平移 (MOUSE.PAN)
+          }}
         />
 
         {/* Post-processing Effects */}
@@ -80,7 +90,7 @@ export const GalaxyCanvas: React.FC = () => {
       {/* Footer Hint */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
         <p className="text-xs text-gray-400 whitespace-nowrap">
-          左键旋转 | 右键平移 | 滚轮缩放 | 单击展开 | 双击添加
+          单指旋转 | 双指平移 | 捏合缩放 | 单击展开 | 双击添加
         </p>
       </div>
     </div>
