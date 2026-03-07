@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { useGraphStore } from '../../stores/useGraphStore';
 import { Planet } from './Planet';
 import { ConnectionLine } from './ConnectionLine';
@@ -62,6 +63,16 @@ export const GalaxyCanvas: React.FC = () => {
           minDistance={10}
           maxDistance={50}
         />
+
+        {/* Post-processing Effects */}
+        <EffectComposer>
+          <Bloom
+            intensity={0.5}
+            luminanceThreshold={0.2}
+            luminanceSmoothing={0.9}
+            mipmapBlur
+          />
+        </EffectComposer>
       </Canvas>
 
       {/* Footer Hint */}
