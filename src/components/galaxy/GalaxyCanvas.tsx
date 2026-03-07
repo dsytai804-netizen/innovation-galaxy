@@ -60,8 +60,10 @@ export const GalaxyCanvas: React.FC = () => {
           dampingFactor={0.05}
           rotateSpeed={0.5}
           zoomSpeed={0.8}
+          panSpeed={0.8}
+          enablePan={true}
           minDistance={10}
-          maxDistance={50}
+          maxDistance={80}
         />
 
         {/* Post-processing Effects */}
@@ -78,7 +80,7 @@ export const GalaxyCanvas: React.FC = () => {
       {/* Footer Hint */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
         <p className="text-xs text-gray-400 whitespace-nowrap">
-          拖拽旋转 | 滚轮缩放 | 单击选择 | 双击展开
+          左键旋转 | 右键平移 | 滚轮缩放 | 单击展开 | 双击添加
         </p>
       </div>
     </div>
