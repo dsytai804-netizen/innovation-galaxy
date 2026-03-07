@@ -1,8 +1,12 @@
-import type { Keyword } from '../../stores/useBasketStore';
+"""
+Innovation Galaxy - 提示词管理
+统一管理所有LLM调用的Prompt模板
+"""
 
-export const PROMPTS = {
-  nodeExpansion: (parentLabel: string, depth: number) => `
-你是一个创新技术专家。用户正在探索"${parentLabel}"领域（当前层级：${depth}）。
+# ==================== 节点扩展Prompt ====================
+
+NODE_EXPANSION_PROMPT = """
+你是一个创新技术专家。用户正在探索"{parent_label}"领域（当前层级：{depth}）。
 
 请生成12-15个该领域下当前最热门、最具创新潜力的细分方向。
 
@@ -14,33 +18,30 @@ export const PROMPTS = {
 5. 确保多样性，覆盖不同子领域
 
 返回JSON格式：
-{
+{{
   "children": [
-    {"label": "文生图", "description": "Stable Diffusion等AI图像生成技术"},
-    {"label": "文生视频", "description": "Sora等视频生成技术"},
+    {{"label": "文生图", "description": "Stable Diffusion等AI图像生成技术"}},
+    {{"label": "文生视频", "description": "Sora等视频生成技术"}},
     ...
   ]
-}
+}}
 
 请直接返回JSON，不要包含其他文字说明。
-`,
+"""
 
-  ideaGeneration: (keywords: Keyword[]) => {
-    const techKeywords = keywords.filter(k => k.type === 'technology').map(k => k.label).join('、');
-    const scenarioKeywords = keywords.filter(k => k.type === 'scenario').map(k => k.label).join('、');
-    const userKeywords = keywords.filter(k => k.type === 'user').map(k => k.label).join('、');
+# ==================== 创意生成Prompt ====================
 
-    return `
+IDEA_GENERATION_PROMPT = """
 给出如下关键词，请生成3个创新产品idea：
 
 【技术维度】
-${techKeywords || '无'}
+{tech_keywords}
 
 【场景维度】
-${scenarioKeywords || '无'}
+{scenario_keywords}
 
 【用户维度】
-${userKeywords || '无'}
+{user_keywords}
 
 要求：
 1. 每个idea包含标题（10字以内）和描述（100-150字）
@@ -50,30 +51,31 @@ ${userKeywords || '无'}
 5. 关注实际用户痛点
 
 返回JSON格式：
-{
+{{
   "ideas": [
-    {
+    {{
       "title": "AI老人健康监护",
       "description": "...",
       "keywords": ["AI技术", "医疗健康", "老年人"]
-    },
+    }},
     ...
   ]
-}
+}}
 
 请直接返回JSON，不要包含其他文字说明。
-`;
-  },
+"""
 
-  productManager: (ideaTitle: string, ideaDescription: string, keywords: string[]) => `
+# ==================== Product Manager Agent Prompt ====================
+
+PM_AGENT_PROMPT = """
 你是一位资深产品经理。请对以下创新产品idea进行商业分析：
 
 【产品Idea】
-${ideaTitle}
-${ideaDescription}
+{idea_title}
+{idea_description}
 
 【相关关键词】
-${keywords.join('、')}
+{keywords}
 
 请按以下结构输出分析报告（每部分100-150字）：
 
@@ -102,17 +104,19 @@ ${keywords.join('、')}
 - 差异化优势
 
 请用专业但易懂的语言，突出商业可行性。
-`,
+"""
 
-  techArchitect: (ideaTitle: string, ideaDescription: string, techKeywords: string[]) => `
+# ==================== Tech Architect Agent Prompt ====================
+
+TECH_AGENT_PROMPT = """
 你是一位资深技术架构师。请为以下产品idea设计技术实现方案：
 
 【产品Idea】
-${ideaTitle}
-${ideaDescription}
+{idea_title}
+{idea_description}
 
 【涉及技术】
-${techKeywords.join('、')}
+{tech_keywords}
 
 请按以下结构输出技术方案（每部分100-150字）：
 
@@ -137,20 +141,22 @@ ${techKeywords.join('、')}
 - 时间估算（MVP版本）
 
 请注重技术的可行性和实用性，适合黑客松快速开发。
-`,
+"""
 
-  orchestrator: (ideaTitle: string, ideaDescription: string, pmAnalysis: string, techAnalysis: string) => `
+# ==================== Orchestrator Agent Prompt ====================
+
+ORCHESTRATOR_PROMPT = """
 你是一位创新项目总监。请整合产品和技术两方面的分析，生成一份完整的产品分析报告。
 
 【产品Idea】
-${ideaTitle}
-${ideaDescription}
+{idea_title}
+{idea_description}
 
 【产品经理分析】
-${pmAnalysis}
+{pm_analysis}
 
 【技术架构师分析】
-${techAnalysis}
+{tech_analysis}
 
 请生成一份结构完整、逻辑清晰的分析报告，包含以下部分：
 
@@ -182,19 +188,21 @@ ${techAnalysis}
 - 突出可行性和创新性
 - 适合黑客松或快速验证场景
 - 使用Markdown格式，结构清晰
-`,
+"""
 
-  followUp: (ideaTitle: string, reportSummary: string, userQuestion: string) => `
+# ==================== 多轮对话Prompt ====================
+
+FOLLOW_UP_PROMPT = """
 你是Innovation Galaxy的AI助手。用户正在针对以下产品idea进行深入探讨：
 
 【产品Idea】
-${ideaTitle}
+{idea_title}
 
 【之前的分析报告】
-${reportSummary}
+{report_summary}
 
 【用户问题】
-${userQuestion}
+{user_question}
 
 请基于之前的分析，针对用户的问题给出专业、有深度的回答。
 
@@ -203,5 +211,4 @@ ${userQuestion}
 - 如需更多细节，可以参考之前的PM和Tech分析
 - 回答要具体、可操作
 - 适当提供例子或参考
-`,
-};
+"""

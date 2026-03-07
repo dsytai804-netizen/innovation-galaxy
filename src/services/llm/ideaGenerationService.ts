@@ -1,5 +1,5 @@
-import { Keyword } from '../../stores/useBasketStore';
-import { Idea } from '../../stores/useAnalysisStore';
+import type { Keyword } from '../../stores/useBasketStore';
+import type { Idea } from '../../stores/useAnalysisStore';
 import { llmClient } from './llmClient';
 import { PROMPTS } from './promptBuilder';
 

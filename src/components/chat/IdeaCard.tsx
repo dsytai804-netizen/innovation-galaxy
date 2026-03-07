@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Idea } from '../../stores/useAnalysisStore';
+import type { Idea } from '../../stores/useAnalysisStore';
 
 interface IdeaCardProps {
   idea: Idea;
