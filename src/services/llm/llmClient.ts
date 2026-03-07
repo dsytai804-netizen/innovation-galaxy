@@ -26,7 +26,12 @@ export class LLMClient {
         },
         body: JSON.stringify({
           model: llmConfig.model,
-          prompt,
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
           temperature: options.temperature ?? 0.7,
           max_tokens: options.maxTokens ?? 1500,
         }),
@@ -34,13 +39,15 @@ export class LLMClient {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('LLM API Error Response:', errorText);
         throw new Error(`LLM API Error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
 
       return {
-        content: data.choices?.[0]?.text || data.content || '',
+        content: data.choices?.[0]?.message?.content || data.content || '',
         usage: data.usage,
       };
     } catch (error) {
