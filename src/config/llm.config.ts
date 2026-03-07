@@ -4,7 +4,7 @@ export const llmConfig = {
   apiEndpoint: import.meta.env.VITE_LLM_API_ENDPOINT || '',
   apiKey: import.meta.env.VITE_LLM_API_KEY || '',
   model: import.meta.env.VITE_LLM_MODEL || 'default-model',
-  timeout: 30000,  // 30秒超时
+  timeout: 60000,  // 60秒超时
   maxRetries: 3,   // 最多重试3次
 };
 

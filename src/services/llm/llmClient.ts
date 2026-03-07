@@ -18,6 +18,13 @@ export class LLMClient {
     retryCount = 0
   ): Promise<LLMResponse> {
     try {
+      console.log('🚀 Calling LLM API:', {
+        endpoint: llmConfig.apiEndpoint,
+        model: llmConfig.model,
+        promptLength: prompt.length,
+        maxTokens: options.maxTokens ?? 4096
+      });
+
       const response = await fetch(llmConfig.apiEndpoint, {
         method: 'POST',
         headers: {
@@ -38,21 +45,33 @@ export class LLMClient {
         signal: AbortSignal.timeout(llmConfig.timeout),
       });
 
+      console.log('✅ API Response Status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('LLM API Error Response:', errorText);
-        throw new Error(`LLM API Error: ${response.status} ${response.statusText}`);
+        console.error('❌ LLM API Error Response:', errorText);
+        throw new Error(`LLM API Error: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('📦 API Response Data:', data);
+
+      const content = data.content?.[0]?.text || data.content || '';
+      console.log('📝 Extracted Content Length:', content.length);
 
       return {
-        content: data.content?.[0]?.text || data.content || '',
+        content,
         usage: data.usage,
       };
-    } catch (error) {
+    } catch (error: any) {
+      console.error('💥 LLM Call Error:', {
+        error: error.message,
+        type: error.name,
+        retryCount,
+      });
+
       if (retryCount < llmConfig.maxRetries) {
-        console.warn(`LLM call failed, retrying (${retryCount + 1}/${llmConfig.maxRetries})...`);
+        console.warn(`🔄 Retrying (${retryCount + 1}/${llmConfig.maxRetries})...`);
         await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
         return this.callWithRetry(prompt, options, retryCount + 1);
       }
