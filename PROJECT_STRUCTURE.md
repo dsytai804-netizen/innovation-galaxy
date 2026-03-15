@@ -55,8 +55,8 @@ public/
 | 文件 | 说明 |
 |------|------|
 | `main.tsx` | React应用入口，渲染根组件 |
-| `App.tsx` | 根组件，布局Header + GalaxyCanvas + ChatPanel + Footer |
-| `index.css` | 全局样式，隐藏默认光标 |
+| `App.tsx` | 根组件，布局: Header + main(GalaxyCanvas + ChatPanel) + Footer(fixed定位) |
+| `index.css` | 全局样式，隐藏默认光标，自定义scrollbar |
 
 ---
 
@@ -69,7 +69,7 @@ React组件目录
 | 文件 | 功能 |
 |------|------|
 | `GalaxyCanvas.tsx` | 3D场景容器，包含Camera、Lights、OrbitControls、Bloom效果 |
-| `Planet.tsx` | 节点星球组件，处理单击/双击交互、悬停效果、旋转动画 |
+| `Planet.tsx` | 节点星球组件，处理单击展开/双击添加、悬停效果、旋转动画 |
 | `ConnectionLine.tsx` | 节点间连接线，使用QuadraticBezierLine绘制 |
 | `ParticleField.tsx` | 背景粒子场，5000个随机分布的星点 |
 
@@ -77,19 +77,23 @@ React组件目录
 
 | 文件 | 功能 |
 |------|------|
-| `IdeaCard.tsx` | 创意卡片，展示单个生成的idea（标题+描述） |
-| `AnalysisProgress.tsx` | 多Agent分析进度指示器 |
-| `ReportView.tsx` | Markdown报告渲染组件 |
+| `InitialView.tsx` | 初始状态视图（灵感篮子+Surprise Me按钮+空状态） |
+| `InspirationBasket.tsx` | 灵感篮子标签组件（Lightbulb图标+关键词标签） |
+| `IdeasView.tsx` | 创意列表视图（返回按钮+可折叠篮子+创意卡片） |
+| `IdeaCard.tsx` | 创意卡片（标题+匹配度+标签+描述+hover效果） |
+| `AnalysisProgress.tsx` | 多Agent分析进度（时间线+CheckCircle2图标） |
+| `ConversationView.tsx` | 对话视图（报告+聊天历史+输入框） |
+| `ChatInput.tsx` | 多行输入框+Send按钮（lucide-react图标） |
 | `ChatMessage.tsx` | 聊天消息气泡（用户/AI） |
-| `ChatInput.tsx` | 多行输入框+发送按钮 |
+| `ReportView.tsx` | Markdown报告渲染组件 |
 
 #### 🧩 layout/ - 布局组件
 
 | 文件 | 功能 |
 |------|------|
-| `Header.tsx` | 顶部导航栏，显示标题和logo |
-| `Footer.tsx` | 底部信息栏，操作提示+版权信息 |
-| `ChatPanel.tsx` | 右侧面板，整合灵感篮子+Surprise Me+内容展示+对话 |
+| `Header.tsx` | 顶部导航栏（Sparkles logo + 标题 + 探索模式badge + 帮助按钮） |
+| `ChatPanel.tsx` | 右侧面板容器（400px固定宽度，状态管理：initial/ideas/analysis/conversation） |
+| `Footer.tsx` | 底部操作提示（fixed定位左下角，4个提示+图标，使用inline styles确保渲染） |
 
 #### 🎨 ui/ - 通用UI组件
 

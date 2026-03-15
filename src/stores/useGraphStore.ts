@@ -32,6 +32,7 @@ interface GraphStore {
   selectNode: (node: GraphNode | null) => void;
   hoverNode: (node: GraphNode | null) => void;
   expandNode: (nodeId: string, children: GraphNode[]) => void;
+  collapseNode: (nodeId: string) => void;
   setIsExpanding: (isExpanding: boolean) => void;
   loadInitialGraph: () => Promise<void>;
 }
@@ -82,6 +83,40 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
       nodes: newNodes,
       edges: [...state.edges, ...newEdges],
       isExpanding: false,
+    });
+  },
+
+  collapseNode: (nodeId) => {
+    const state = get();
+    const parentNode = state.nodes.find(n => n.id === nodeId);
+    if (!parentNode || !parentNode.expanded) return;
+
+    // Recursively collect all descendant IDs
+    const collectDescendants = (nodeId: string): string[] => {
+      const node = state.nodes.find(n => n.id === nodeId);
+      if (!node || !node.children) return [];
+
+      const childIds = node.children.map(c => c.id);
+      const grandchildIds = childIds.flatMap(id => collectDescendants(id));
+
+      return [...childIds, ...grandchildIds];
+    };
+
+    const descendantIds = collectDescendants(nodeId);
+
+    // Remove descendants from nodes
+    const updatedNodes = state.nodes
+      .filter(n => !descendantIds.includes(n.id))
+      .map(n => n.id === nodeId ? { ...n, expanded: false, children: [] } : n);
+
+    // Remove edges connected to descendants
+    const updatedEdges = state.edges.filter(
+      e => !descendantIds.includes(e.source) && !descendantIds.includes(e.target)
+    );
+
+    set({
+      nodes: updatedNodes,
+      edges: updatedEdges,
     });
   },
 

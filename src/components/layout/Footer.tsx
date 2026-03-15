@@ -1,41 +1,90 @@
 import React from 'react';
+import { MoveVertical, MousePointer2, Search, Sparkles, Move, Rotate3D } from 'lucide-react';
+import { useControlStore } from '../../stores/useControlStore';
 
 export const Footer: React.FC = () => {
+  const { controlMode, toggleControlMode } = useControlStore();
   return (
-    <footer className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm border-t border-white/5">
-      <div className="h-full max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* 左侧：项目信息 */}
-        <div className="flex items-center gap-4 text-xs text-gray-400">
-          <span className="font-medium text-gray-300">Innovation Galaxy</span>
-          <span className="text-gray-600">|</span>
-          <span>智能创意生成系统</span>
-        </div>
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '24px',
+        left: '24px',
+        zIndex: 999,
+        pointerEvents: 'none'
+      }}
+    >
+      <div
+        style={{
+          background: 'rgba(30, 36, 51, 0.9)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          padding: '12px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '24px',
+          fontSize: '12px',
+          color: 'rgb(203 213 225)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          pointerEvents: 'auto'
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <MoveVertical style={{ width: '14px', height: '14px', color: 'rgb(129 140 248)' }} />
+          <span>{controlMode === 'rotation' ? '拖拽旋转' : '拖拽平移'}</span>
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Search style={{ width: '14px', height: '14px', color: 'rgb(129 140 248)' }} />
+          <span>滚轮缩放</span>
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <MousePointer2 style={{ width: '14px', height: '14px', color: 'rgb(129 140 248)' }} />
+          <span>单击选择</span>
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Sparkles style={{ width: '14px', height: '14px', color: 'rgb(129 140 248)' }} />
+          <span>双击展开</span>
+        </span>
 
-        {/* 中间：交互提示 */}
-        <div className="flex items-center gap-6 text-xs text-gray-400">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
-            <span>拖拽旋转</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
-            <span>滚轮缩放</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-purple-400 rounded-full"></span>
-            <span>单击选中</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
-            <span>双击展开</span>
-          </div>
-        </div>
-
-        {/* 右侧：版权信息 */}
-        <div className="text-xs text-gray-500">
-          Powered by Claude AI
-        </div>
+        {/* Mode Toggle Button */}
+        <button
+          onClick={toggleControlMode}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            background: 'rgba(99, 102, 241, 0.15)',
+            border: '1px solid rgba(129, 140, 248, 0.3)',
+            borderRadius: '8px',
+            fontSize: '12px',
+            color: 'rgb(129 140 248)',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.25)';
+            e.currentTarget.style.borderColor = 'rgba(129, 140, 248, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.15)';
+            e.currentTarget.style.borderColor = 'rgba(129, 140, 248, 0.3)';
+          }}
+        >
+          {controlMode === 'rotation' ? (
+            <>
+              <Move style={{ width: '14px', height: '14px' }} />
+              <span>切换平移</span>
+            </>
+          ) : (
+            <>
+              <Rotate3D style={{ width: '14px', height: '14px' }} />
+              <span>切换旋转</span>
+            </>
+          )}
+        </button>
       </div>
-    </footer>
+    </div>
   );
 };

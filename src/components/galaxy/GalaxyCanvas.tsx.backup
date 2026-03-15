@@ -2,18 +2,16 @@ import React, { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import * as THREE from 'three';
 import { useGraphStore } from '../../stores/useGraphStore';
-import { useControlStore } from '../../stores/useControlStore';
 import { Planet } from './Planet';
 import { ConnectionLine } from './ConnectionLine';
 import { ParticleField } from './ParticleField';
+import { Footer } from '../layout/Footer';
 
 export const GalaxyCanvas: React.FC = () => {
   const loadInitialGraph = useGraphStore((state) => state.loadInitialGraph);
   const nodes = useGraphStore((state) => state.nodes);
   const edges = useGraphStore((state) => state.edges);
-  const controlMode = useControlStore((state) => state.controlMode);
 
   useEffect(() => {
     loadInitialGraph();
@@ -63,35 +61,7 @@ export const GalaxyCanvas: React.FC = () => {
           dampingFactor={0.05}
           rotateSpeed={0.6}
           zoomSpeed={1.0}
-          enableRotate={controlMode === 'rotation'}
-          enablePan={controlMode === 'pan'}
-          panSpeed={1.0}
-          // 在平移模式下，将左键设置为平移而不是旋转
-          mouseButtons={
-            controlMode === 'pan'
-              ? {
-                  LEFT: THREE.MOUSE.PAN,
-                  MIDDLE: THREE.MOUSE.DOLLY,
-                  RIGHT: THREE.MOUSE.ROTATE,
-                }
-              : {
-                  LEFT: THREE.MOUSE.ROTATE,
-                  MIDDLE: THREE.MOUSE.DOLLY,
-                  RIGHT: THREE.MOUSE.PAN,
-                }
-          }
-          // 触摸控制 - 支持触控板和触摸屏
-          touches={
-            controlMode === 'pan'
-              ? {
-                  ONE: THREE.TOUCH.PAN,      // 单指 = 平移
-                  TWO: THREE.TOUCH.DOLLY_PAN, // 双指 = 缩放+平移
-                }
-              : {
-                  ONE: THREE.TOUCH.ROTATE,    // 单指 = 旋转
-                  TWO: THREE.TOUCH.DOLLY_PAN, // 双指 = 缩放+平移
-                }
-          }
+          enablePan={false}
           minDistance={10}
           maxDistance={80}
           // 平滑的惯性滚动
@@ -109,6 +79,9 @@ export const GalaxyCanvas: React.FC = () => {
           />
         </EffectComposer>
       </Canvas>
+
+      {/* Footer - 左下角浮动提示条 */}
+      <Footer />
     </div>
   );
 };

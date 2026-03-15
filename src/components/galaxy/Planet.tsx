@@ -18,6 +18,7 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
   const addKeyword = useBasketStore((state) => state.addKeyword);
   const hasKeyword = useBasketStore((state) => state.hasKeyword);
   const expandNode = useGraphStore((state) => state.expandNode);
+  const collapseNode = useGraphStore((state) => state.collapseNode);
   const setIsExpanding = useGraphStore((state) => state.setIsExpanding);
 
   const isSelected = hasKeyword(node.id);
@@ -29,29 +30,18 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
     }
   });
 
-  // Click handler - add to basket (按PRD定义)
-  const handleClick = (e: any) => {
+  // Click handler - expand/collapse node (new behavior)
+  const handleClick = async (e: any) => {
     e.stopPropagation();
 
-    if (!isSelected) {
-      addKeyword({
-        id: node.id,
-        label: node.label,
-        type: node.type === 'core' ? 'technology' : node.type,
-        color: node.color,
-      });
-    }
-  };
-
-  // Double click handler - expand node (按PRD定义)
-  const handleDoubleClick = async (e: any) => {
-    e.stopPropagation();
-
+    // If already expanded, collapse it
     if (node.expanded) {
-      console.log('Node already expanded');
+      console.log('Collapsing node:', node.label);
+      collapseNode(node.id);
       return;
     }
 
+    // Otherwise, expand it
     try {
       setIsExpanding(true);
       console.log('Expanding node:', node.label);
@@ -65,6 +55,20 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
       alert('节点扩展失败，请检查LLM API配置');
     } finally {
       setIsExpanding(false);
+    }
+  };
+
+  // Double click handler - add to basket (new behavior)
+  const handleDoubleClick = (e: any) => {
+    e.stopPropagation();
+
+    if (!isSelected) {
+      addKeyword({
+        id: node.id,
+        label: node.label,
+        type: node.type === 'core' ? 'technology' : node.type,
+        color: node.color,
+      });
     }
   };
 
@@ -112,12 +116,13 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
       {/* Label */}
       <Text
         position={[0, node.size * 0.8, 0]}
-        fontSize={0.3}
-        color="white"
+        fontSize={hovered ? 0.36 : 0.3}
+        color={hovered ? node.color : 'white'}
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.02}
+        outlineWidth={0.015}
         outlineColor="#000000"
+        fillOpacity={hovered ? 1 : 0.95}
       >
         {node.label}
       </Text>

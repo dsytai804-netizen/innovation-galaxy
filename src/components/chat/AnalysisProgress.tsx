@@ -1,14 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { CheckCircle2 } from 'lucide-react';
 
 interface AnalysisProgressProps {
   currentAgent: 'pm' | 'tech' | 'orchestrator' | null;
 }
 
 const AGENT_INFO = {
-  pm: { name: 'Product Manager', icon: '👔', color: '#4A90E2' },
-  tech: { name: 'Tech Architect', icon: '🔧', color: '#50C878' },
-  orchestrator: { name: 'Orchestrator', icon: '🎯', color: '#FFD700' },
+  pm: { name: 'Product Manager', label: '商业可行性评估', color: '#4A90E2' },
+  tech: { name: 'Tech Architect', label: '技术架构设计', color: '#50C878' },
+  orchestrator: { name: 'Orchestrator', label: '生成报告摘要', color: '#FFD700' },
 };
 
 export const AnalysisProgress: React.FC<AnalysisProgressProps> = ({
@@ -17,50 +18,50 @@ export const AnalysisProgress: React.FC<AnalysisProgressProps> = ({
   const agents: Array<'pm' | 'tech' | 'orchestrator'> = ['pm', 'tech', 'orchestrator'];
 
   return (
-    <div className="p-6 space-y-4">
-      <h3 className="text-sm font-semibold text-white mb-4">
-        🤖 AI Multi-Agent 分析中...
-      </h3>
+    <div className="p-6 space-y-5">
+      <div className="flex items-center gap-3 text-sm text-indigo-400 font-medium">
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}>
+          <div className="w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent" />
+        </motion.div>
+        <span>多Agent思考中...</span>
+      </div>
 
-      {agents.map((agent) => {
-        const info = AGENT_INFO[agent];
-        const isActive = currentAgent === agent;
-        const currentIndex = currentAgent ? agents.indexOf(currentAgent) : -1;
-        const agentIndex = agents.indexOf(agent);
-        const isCompleted = currentIndex > agentIndex;
+      <div className="space-y-4 pl-2.5 border-l-2 border-indigo-500/20 ml-2">
+        {agents.map((agent, idx) => {
+          const info = AGENT_INFO[agent];
+          const isActive = currentAgent === agent;
+          const currentIndex = currentAgent ? agents.indexOf(currentAgent) : -1;
+          const agentIndex = agents.indexOf(agent);
+          const isCompleted = currentIndex > agentIndex;
 
-        return (
-          <motion.div
-            key={agent}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: agentIndex * 0.1 }}
-            className={`
-              flex items-center gap-3 p-3 rounded-lg border transition-all
-              ${isActive ? 'border-tech-blue bg-tech-blue/10' :
-                isCompleted ? 'border-scenario-green bg-scenario-green/10' :
-                'border-white/10 bg-white/5'}
-            `}
-          >
-            <div className="text-2xl">{info.icon}</div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-white">{info.name}</div>
-              <div className="text-xs text-gray-400">
-                {isActive && '正在分析...'}
-                {isCompleted && '✓ 完成'}
-                {!isActive && !isCompleted && '等待中'}
-              </div>
-            </div>
-            {isActive && (
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                className="w-4 h-4 border-2 border-tech-blue border-t-transparent rounded-full"
-              />
-            )}
-          </motion.div>
-        );
-      })}
+          return (
+            <motion.div
+              key={agent}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.2 }}
+              className="flex items-center gap-3 text-[13px]"
+            >
+              {isCompleted ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              ) : isActive ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full"
+                />
+              ) : (
+                <div className="w-4 h-4 rounded-full border border-slate-500 flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-slate-500 rounded-full" />
+                </div>
+              )}
+              <span className={isCompleted || isActive ? 'text-slate-300' : 'text-slate-400'}>
+                {info.label}
+              </span>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 };

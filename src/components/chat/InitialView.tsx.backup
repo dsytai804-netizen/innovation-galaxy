@@ -1,0 +1,95 @@
+import React from 'react';
+import { SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { InspirationBasket } from './InspirationBasket';
+import type { Keyword } from '../../stores/useBasketStore';
+
+interface InitialViewProps {
+  keywords: Keyword[];
+  maxKeywords: number;
+  onRemoveKeyword: (id: string) => void;
+  onSurpriseMe: () => void;
+  isGenerating: boolean;
+}
+
+export const InitialView: React.FC<InitialViewProps> = ({
+  keywords,
+  maxKeywords,
+  onRemoveKeyword,
+  onSurpriseMe,
+  isGenerating,
+}) => {
+  return (
+    <>
+      {/* 灵感篮子 */}
+      <div className="p-5 border-b border-white/5 flex-shrink-0 bg-[#151B2B]">
+        <InspirationBasket
+          keywords={keywords}
+          maxKeywords={maxKeywords}
+          onRemove={onRemoveKeyword}
+        />
+      </div>
+
+      {/* Surprise Me 按钮 */}
+      <div className="p-5 pb-3 flex-shrink-0">
+        <button
+          disabled={keywords.length === 0 || isGenerating}
+          onClick={onSurpriseMe}
+          data-cursor="interactive"
+          className="w-full h-[56px] rounded-xl font-bold text-[15px]
+            transition-all hover:-translate-y-0.5 active:translate-y-0
+            flex items-center justify-center gap-2 relative
+            disabled:cursor-not-allowed disabled:opacity-50"
+          style={
+            keywords.length > 0 && !isGenerating
+              ? {
+                  background: 'linear-gradient(to right, #6366F1, #A855F7, #EC4899)',
+                  boxShadow: '0 4px 20px rgba(139,92,246,0.25)',
+                  color: 'white',
+                }
+              : {
+                  background: '#2D2D2D',
+                  color: '#B3B3B3',
+                }
+          }
+          onMouseEnter={(e) => {
+            if (keywords.length > 0 && !isGenerating) {
+              e.currentTarget.style.boxShadow = '0 4px 25px rgba(139,92,246,0.4)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (keywords.length > 0 && !isGenerating) {
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(139,92,246,0.25)';
+            }
+          }}
+        >
+          {isGenerating ? (
+            <>
+              <ArrowPathIcon className="w-5 h-5 animate-spin" />
+              <span>生成中...</span>
+            </>
+          ) : (
+            <>
+              <SparklesIcon className="w-5 h-5" />
+              <span>Surprise Me</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* 内容区域 */}
+      <div className="flex-1 overflow-y-auto flex flex-col p-5 pt-2">
+        {keywords.length === 0 && (
+          <div className="h-full flex flex-col items-center justify-center text-center px-4 space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#1A2235] flex items-center justify-center border border-white/5 shadow-inner">
+              <span className="text-4xl">🤖</span>
+            </div>
+            <div>
+              <p className="text-sm text-slate-300 font-medium mb-1.5">等待生成灵感</p>
+              <p className="text-xs leading-relaxed text-slate-500">收集足够的灵感后，点击上方按钮，AI多智能体将为您分析并生成创新创业Idea。</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
