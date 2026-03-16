@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface AnalysisProgressProps {
   currentAgent: 'pm' | 'tech' | 'orchestrator' | null;
@@ -21,7 +21,7 @@ export const AnalysisProgress: React.FC<AnalysisProgressProps> = ({
     <div className="p-6 space-y-5">
       <div className="flex items-center gap-3 text-sm text-indigo-400 font-medium">
         <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}>
-          <div className="w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent" />
+          <div className="w-6 h-6 rounded-full border-2 border-indigo-500 border-t-transparent" />
         </motion.div>
         <span>多Agent思考中...</span>
       </div>
@@ -43,16 +43,18 @@ export const AnalysisProgress: React.FC<AnalysisProgressProps> = ({
               className="flex items-center gap-3 text-[13px]"
             >
               {isCompleted ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-4 h-4 text-white stroke-[3]" />
+                </div>
               ) : isActive ? (
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full"
+                  className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full flex-shrink-0"
                 />
               ) : (
-                <div className="w-4 h-4 rounded-full border border-slate-500 flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 bg-slate-500 rounded-full" />
+                <div className="w-6 h-6 rounded-full border-2 border-slate-600 flex items-center justify-center flex-shrink-0">
+                  <div className="w-2.5 h-2.5 bg-slate-600 rounded-full" />
                 </div>
               )}
               <span className={isCompleted || isActive ? 'text-slate-300' : 'text-slate-400'}>

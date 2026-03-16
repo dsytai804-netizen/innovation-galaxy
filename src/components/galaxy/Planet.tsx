@@ -14,6 +14,7 @@ interface PlanetProps {
 export const Planet: React.FC<PlanetProps> = ({ node }) => {
   const meshRef = useRef<Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  const clickTimeoutRef = useRef<number | null>(null);
 
   const addKeyword = useBasketStore((state) => state.addKeyword);
   const hasKeyword = useBasketStore((state) => state.hasKeyword);
@@ -30,37 +31,55 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
     }
   });
 
-  // Click handler - expand/collapse node (new behavior)
+  // Click handler - expand/collapse node with delay to distinguish from double click
   const handleClick = async (e: any) => {
     e.stopPropagation();
 
-    // If already expanded, collapse it
-    if (node.expanded) {
-      console.log('Collapsing node:', node.label);
-      collapseNode(node.id);
-      return;
+    // Clear any existing timeout
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+      return; // This is a double-click, don't expand
     }
 
-    // Otherwise, expand it
-    try {
-      setIsExpanding(true);
-      console.log('Expanding node:', node.label);
+    // Set a timeout to wait for potential double click
+    clickTimeoutRef.current = window.setTimeout(async () => {
+      clickTimeoutRef.current = null;
 
-      const children = await nodeExpansionService.expandNode(node);
-      expandNode(node.id, children);
+      // If already expanded, collapse it
+      if (node.expanded) {
+        console.log('Collapsing node:', node.label);
+        collapseNode(node.id);
+        return;
+      }
 
-      console.log(`Expanded ${node.label} with ${children.length} children`);
-    } catch (error) {
-      console.error('Failed to expand node:', error);
-      alert('节点扩展失败，请检查LLM API配置');
-    } finally {
-      setIsExpanding(false);
-    }
+      // Otherwise, expand it
+      try {
+        setIsExpanding(true);
+        console.log('Expanding node:', node.label);
+
+        const children = await nodeExpansionService.expandNode(node);
+        expandNode(node.id, children);
+
+        console.log(`Expanded ${node.label} with ${children.length} children`);
+      } catch (error) {
+        console.error('Failed to expand node:', error);
+        alert('节点扩展失败，请检查LLM API配置');
+      } finally {
+        setIsExpanding(false);
+      }
+    }, 250); // 250ms delay to detect double click
   };
 
-  // Double click handler - add to basket (new behavior)
+  // Double click handler - add to basket (prevents expansion)
   const handleDoubleClick = (e: any) => {
     e.stopPropagation();
+
+    // Clear the single click timeout
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
 
     if (!isSelected) {
       addKeyword({
@@ -113,9 +132,9 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
         </mesh>
       )}
 
-      {/* Label */}
+      {/* Label - 文字位置根据深度调整，避免重叠 */}
       <Text
-        position={[0, node.size * 0.8, 0]}
+        position={[0, node.size * 0.9, 0]}
         fontSize={hovered ? 0.36 : 0.3}
         color={hovered ? node.color : 'white'}
         anchorX="center"
@@ -123,6 +142,8 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
         outlineWidth={0.015}
         outlineColor="#000000"
         fillOpacity={hovered ? 1 : 0.95}
+        maxWidth={3}
+        textAlign="center"
       >
         {node.label}
       </Text>

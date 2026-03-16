@@ -2,6 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { ChevronLeft, Sparkles, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
+import 'highlight.js/styles/github-dark.css';
 import { InspirationBasket } from './InspirationBasket';
 import { ChatInput } from './ChatInput';
 import type { Keyword } from '../../stores/useBasketStore';
@@ -16,6 +20,7 @@ interface ConversationViewProps {
   onBack: () => void;
   onSendMessage: (message: string) => void;
   isSending: boolean;
+  isAnalyzing: boolean;
 }
 
 export const ConversationView: React.FC<ConversationViewProps> = ({
@@ -27,6 +32,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
   onBack,
   onSendMessage,
   isSending,
+  isAnalyzing,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [basketExpanded, setBasketExpanded] = React.useState(false);
@@ -89,7 +95,66 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
           </div>
           <div className="flex-1 px-4 py-3 rounded-2xl bg-[#1A2235] border border-white/5">
             <div className="prose prose-sm prose-invert max-w-none">
-              <ReactMarkdown>{report}</ReactMarkdown>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                components={{
+                  h1: ({ node, ...props }) => (
+                    <h1 className="text-2xl font-bold text-indigo-200 mb-4 pb-3 border-b-2 border-indigo-500/30 mt-8 first:mt-0" {...props} />
+                  ),
+                  h2: ({ node, ...props }) => (
+                    <h2 className="text-xl font-semibold text-indigo-300 mb-3 mt-6 pb-2 border-b border-slate-700" {...props} />
+                  ),
+                  h3: ({ node, ...props }) => (
+                    <h3 className="text-lg font-medium text-slate-200 mb-2 mt-4" {...props} />
+                  ),
+                  p: ({ node, ...props }) => (
+                    <p className="text-sm text-slate-300 leading-relaxed mb-4" {...props} />
+                  ),
+                  ul: ({ node, ...props }) => (
+                    <ul className="list-disc list-outside ml-5 mb-4 space-y-2" {...props} />
+                  ),
+                  ol: ({ node, ...props }) => (
+                    <ol className="list-decimal list-outside ml-5 mb-4 space-y-2" {...props} />
+                  ),
+                  li: ({ node, ...props }) => (
+                    <li className="text-sm text-slate-300 leading-relaxed" {...props} />
+                  ),
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote className="border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-500/5 my-4 italic text-slate-400" {...props} />
+                  ),
+                  code: ({ node, inline, ...props }: any) =>
+                    inline ? (
+                      <code className="bg-slate-800 text-pink-300 px-1.5 py-0.5 rounded text-xs font-mono" {...props} />
+                    ) : (
+                      <code className="block bg-slate-900 p-4 rounded-lg text-sm font-mono overflow-x-auto my-4" {...props} />
+                    ),
+                  pre: ({ node, ...props }) => (
+                    <pre className="bg-slate-900 rounded-lg overflow-hidden my-4" {...props} />
+                  ),
+                  table: ({ node, ...props }) => (
+                    <div className="overflow-x-auto my-4">
+                      <table className="min-w-full border border-slate-700" {...props} />
+                    </div>
+                  ),
+                  th: ({ node, ...props }) => (
+                    <th className="bg-slate-800 border border-slate-700 px-3 py-2 text-left text-sm font-semibold text-slate-200" {...props} />
+                  ),
+                  td: ({ node, ...props }) => (
+                    <td className="border border-slate-700 px-3 py-2 text-sm text-slate-300" {...props} />
+                  ),
+                  strong: ({ node, ...props }) => (
+                    <strong className="font-bold text-indigo-300" {...props} />
+                  ),
+                }}
+              >
+                {report}
+              </ReactMarkdown>
+
+              {/* 打字光标 - 仅在报告生成过程中显示 */}
+              {isAnalyzing && report && (
+                <span className="inline-block w-2 h-4 bg-indigo-400 animate-pulse ml-1 align-middle" />
+              )}
             </div>
           </div>
         </div>

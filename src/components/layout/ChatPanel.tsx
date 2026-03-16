@@ -11,7 +11,11 @@ import { ConversationView } from '../chat/ConversationView';
 
 type PanelState = 'initial' | 'ideas' | 'analysis' | 'conversation';
 
-export const ChatPanel: React.FC = () => {
+interface ChatPanelProps {
+  width?: number;
+}
+
+export const ChatPanel: React.FC<ChatPanelProps> = ({ width = 400 }) => {
   const keywords = useBasketStore((state) => state.keywords);
   const removeKeyword = useBasketStore((state) => state.removeKeyword);
   const maxKeywords = useBasketStore((state) => state.maxKeywords);
@@ -26,6 +30,7 @@ export const ChatPanel: React.FC = () => {
   const addChatMessage = useAnalysisStore((state) => state.addChatMessage);
   const isGenerating = useAnalysisStore((state) => state.isGenerating);
   const setIsGenerating = useAnalysisStore((state) => state.setIsGenerating);
+  const isAnalyzing = useAnalysisStore((state) => state.isAnalyzing);  // 🔧 修复：提前调用
   const setIsAnalyzing = useAnalysisStore((state) => state.setIsAnalyzing);
   const currentAgent = useAnalysisStore((state) => state.currentAgent);
   const setCurrentAgent = useAnalysisStore((state) => state.setCurrentAgent);
@@ -51,6 +56,26 @@ export const ChatPanel: React.FC = () => {
     }
   };
 
+  const handleRegenerateIdeas = async () => {
+    if (keywords.length === 0) {
+      alert('请先选择关键词');
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+      setIdeas([]); // 清空旧ideas
+      const generatedIdeas = await ideaGenerationService.generateIdeas(keywords);
+      setIdeas(generatedIdeas);
+      setSelectedIdeas([]); // 重置选中状态
+    } catch (error) {
+      console.error('Failed to regenerate ideas:', error);
+      alert('重新生成失败，请重试');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const toggleIdeaSelection = (idea: Idea) => {
     setSelectedIdeas(prev => {
       if (prev.includes(idea.id)) {
@@ -68,22 +93,53 @@ export const ChatPanel: React.FC = () => {
     const ideaToAnalyze = ideas.find(i => i.id === selectedIdeas[0]);
     if (!ideaToAnalyze) return;
 
+    console.log('🚀 handleDeepAnalysis started for:', ideaToAnalyze.title);
+
     try {
       setPanelState('analysis');
       setIsAnalyzing(true);
       selectIdea(ideaToAnalyze);
+      setReport(''); // 清空旧报告
 
-      const analysisReport = await multiAgentService.analyzeIdea(
+      let accumulatedReport = '';
+      let hasStartedStreaming = false;
+
+      await multiAgentService.analyzeIdea(
         ideaToAnalyze,
-        (agent) => setCurrentAgent(agent)
+        (agent, chunk) => {
+          console.log(`📊 Agent callback: ${agent}, chunk length: ${chunk?.length || 0}`);
+          setCurrentAgent(agent);
+
+          // 流式更新报告
+          if (agent === 'orchestrator' && chunk) {
+            accumulatedReport += chunk;
+            setReport(accumulatedReport); // 实时更新
+
+            // 第一次收到chunk时切换到conversation
+            if (!hasStartedStreaming) {
+              console.log('🎉 First chunk received, switching to conversation view');
+              setPanelState('conversation');
+              hasStartedStreaming = true;
+            }
+          }
+        }
       );
 
-      setReport(analysisReport);
+      console.log('✅ Analysis completed, final report length:', accumulatedReport.length);
+
+      // 确保最终切换到conversation状态
+      if (accumulatedReport.length > 0) {
+        setPanelState('conversation');
+        console.log('✅ Switched to conversation view');
+      } else {
+        console.warn('⚠️ Report is empty!');
+      }
+
+      // 分析完成
       setCurrentAgent(null);
-      setPanelState('conversation');
     } catch (error) {
-      console.error('Failed to analyze idea:', error);
-      alert('分析失败，请检查LLM API配置');
+      console.error('💥 Failed to analyze idea:', error);
+      alert(`分析失败: ${error instanceof Error ? error.message : '未知错误'}`);
       setIsAnalyzing(false);
       setCurrentAgent(null);
       setPanelState('ideas');
@@ -124,7 +180,10 @@ export const ChatPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-[400px] flex-shrink-0 bg-[#0F1423] border-l border-white/5 flex flex-col z-10 shadow-2xl relative h-full font-sans">
+    <div
+      className="flex-shrink-0 bg-[#0F1423] border-l border-white/5 flex flex-col z-10 shadow-2xl relative h-full font-sans"
+      style={{ width: `${width}px` }}
+    >
       <AnimatePresence mode="wait">
         {panelState === 'initial' && (
           <motion.div
@@ -163,6 +222,8 @@ export const ChatPanel: React.FC = () => {
               onToggleIdea={toggleIdeaSelection}
               onBack={handleBackToInitial}
               onAnalyze={handleDeepAnalysis}
+              onRegenerateIdeas={handleRegenerateIdeas}
+              isGenerating={isGenerating}
             />
           </motion.div>
         )}
@@ -198,6 +259,7 @@ export const ChatPanel: React.FC = () => {
               onBack={handleBackToInitial}
               onSendMessage={handleSendMessage}
               isSending={isSendingMessage}
+              isAnalyzing={isAnalyzing}
             />
           </motion.div>
         )}

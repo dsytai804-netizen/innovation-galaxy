@@ -1,7 +1,12 @@
 import React from 'react';
-import { Sparkles, MousePointer2, HelpCircle } from 'lucide-react';
+import { Sparkles, MousePointer2, HelpCircle, PanelRightClose, PanelRightOpen } from 'lucide-react';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onTogglePanel: () => void;
+  isPanelCollapsed: boolean;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onTogglePanel, isPanelCollapsed }) => {
   return (
     <header className="h-[60px] flex-shrink-0 flex items-center justify-between px-6 border-b border-white/10 bg-[#0B0F19] z-20 sticky top-0">
       <div className="flex items-center gap-3">
@@ -16,10 +21,26 @@ export const Header: React.FC = () => {
         </span>
       </div>
       <div className="flex items-center gap-6 text-sm text-slate-400">
-        <span className="flex items-center gap-2 text-indigo-300 bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/20">
-          <MousePointer2 className="w-3.5 h-3.5" /> 探索模式
-        </span>
-        <button className="flex items-center gap-1.5 hover:text-white transition-colors">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onTogglePanel();
+          }}
+          className="flex items-center gap-2 text-indigo-300 bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/20 hover:bg-indigo-500/20 hover:text-indigo-200 transition-all cursor-pointer"
+          data-cursor="interactive"
+        >
+          {isPanelCollapsed ? (
+            <>
+              <PanelRightOpen className="w-3.5 h-3.5" /> 探索模式
+            </>
+          ) : (
+            <>
+              <MousePointer2 className="w-3.5 h-3.5" /> 探索模式
+            </>
+          )}
+        </button>
+        <button className="flex items-center gap-1.5 hover:text-white transition-colors" data-cursor="interactive">
           <HelpCircle className="w-4 h-4" /> 帮助
         </button>
       </div>

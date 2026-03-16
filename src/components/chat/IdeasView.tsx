@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, FileText } from 'lucide-react';
+import { ChevronLeft, FileText, RefreshCw, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InspirationBasket } from './InspirationBasket';
 import { IdeaCard } from './IdeaCard';
@@ -15,6 +15,8 @@ interface IdeasViewProps {
   onToggleIdea: (idea: Idea) => void;
   onBack: () => void;
   onAnalyze: () => void;
+  onRegenerateIdeas: () => Promise<void>;
+  isGenerating: boolean;
 }
 
 export const IdeasView: React.FC<IdeasViewProps> = ({
@@ -26,6 +28,8 @@ export const IdeasView: React.FC<IdeasViewProps> = ({
   onToggleIdea,
   onBack,
   onAnalyze,
+  onRegenerateIdeas,
+  isGenerating,
 }) => {
   const [basketExpanded, setBasketExpanded] = React.useState(false);
 
@@ -86,6 +90,22 @@ export const IdeasView: React.FC<IdeasViewProps> = ({
             isSelected={selectedIdeas.includes(idea.id)}
           />
         ))}
+
+        {/* 重新生成按钮 */}
+        <div className="pt-2">
+          <button
+            onClick={onRegenerateIdeas}
+            disabled={isGenerating}
+            className="w-full py-2.5 bg-slate-700/50 hover:bg-slate-700/70
+              text-slate-300 hover:text-white rounded-lg transition-all
+              flex items-center justify-center gap-2 text-sm
+              disabled:opacity-50 disabled:cursor-not-allowed"
+            data-cursor="interactive"
+          >
+            <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+            <span>{isGenerating ? '生成中...' : '重新生成创意'}</span>
+          </button>
+        </div>
       </div>
 
       {/* 底部：Deep Analysis 按钮（sticky） */}
@@ -105,6 +125,19 @@ export const IdeasView: React.FC<IdeasViewProps> = ({
           >
             <span>Deep Analysis ({selectedIdeas.length})</span>
           </motion.button>
+
+          {/* 对话框提示 */}
+          <div className="mt-4 px-3 py-3 bg-indigo-500/5 border border-indigo-500/10 rounded-lg">
+            <div className="flex items-start gap-3">
+              <MessageSquare className="w-5 h-5 text-indigo-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  选中您感兴趣的创意后，点击"深度分析"生成完整产品报告。
+                  报告生成后，您可以继续提问细化方案。
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -23,13 +23,14 @@ export const GalaxyCanvas: React.FC = () => {
     <div className="flex-1 bg-galaxy-bg relative">
       {/* 3D Canvas */}
       <Canvas>
-        {/* Camera */}
-        <PerspectiveCamera makeDefault position={[0, 0, 25]} fov={60} />
+        {/* Camera - 正面视角，但有更大的缩放范围 */}
+        <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={60} />
 
-        {/* Lights */}
-        <ambientLight intensity={0.3} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
+        {/* Lights - 增强立体感 */}
+        <ambientLight intensity={0.35} />
+        <pointLight position={[10, 10, 10]} intensity={1.0} />
         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#4A90E2" />
+        <pointLight position={[0, 0, 15]} intensity={0.3} color="#9370DB" />
 
         {/* Particle Field */}
         <ParticleField />
@@ -66,6 +67,7 @@ export const GalaxyCanvas: React.FC = () => {
           enableRotate={controlMode === 'rotation'}
           enablePan={controlMode === 'pan'}
           panSpeed={1.0}
+          target={[0, 0, 0]}
           // 在平移模式下，将左键设置为平移而不是旋转
           mouseButtons={
             controlMode === 'pan'
@@ -92,7 +94,7 @@ export const GalaxyCanvas: React.FC = () => {
                   TWO: THREE.TOUCH.DOLLY_PAN, // 双指 = 缩放+平移
                 }
           }
-          minDistance={10}
+          minDistance={3}
           maxDistance={80}
           // 平滑的惯性滚动
           enableZoom={true}

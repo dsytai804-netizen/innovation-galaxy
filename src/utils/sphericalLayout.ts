@@ -30,6 +30,11 @@ export function generateChildNodePositions(
   parentNode: GraphNode,
   childCount: number
 ): Array<[number, number, number]> {
-  const radius = 3;
+  // 根据子节点数量动态调整半径，避免重叠
+  // 基础半径 + 每个节点额外增加一点空间
+  const baseRadius = 4;
+  const extraRadius = Math.min(childCount * 0.3, 3); // 最多增加3单位
+  const radius = baseRadius + extraRadius;
+
   return generateFibonacciSphere(childCount, radius, parentNode.position);
 }
