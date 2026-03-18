@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, MousePointer2, HelpCircle, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Sparkles, MousePointer2, HelpCircle, PanelRightOpen } from 'lucide-react';
 
 interface HeaderProps {
   onTogglePanel: () => void;
@@ -13,12 +13,11 @@ export const Header: React.FC<HeaderProps> = ({ onTogglePanel, isPanelCollapsed 
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
           <Sparkles className="w-4 h-4 text-white" />
         </div>
-        <h1 className="text-[17px] font-bold text-white tracking-wide flex items-center gap-2">
+        <h1 className="text-[17px] font-bold text-white tracking-wide flex items-center">
           Innovation Galaxy
+          <span className="mx-3 text-white/20 font-light">｜</span>
+          <span className="text-slate-300 font-medium">点子孵化器</span>
         </h1>
-        <span className="text-slate-500 text-sm border-l border-white/10 pl-3 ml-1">
-          智能创意生成系统
-        </span>
       </div>
       <div className="flex items-center gap-6 text-sm text-slate-400">
         <button

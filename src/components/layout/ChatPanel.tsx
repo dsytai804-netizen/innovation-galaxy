@@ -139,7 +139,18 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ width = 400 }) => {
       setCurrentAgent(null);
     } catch (error) {
       console.error('💥 Failed to analyze idea:', error);
-      alert(`分析失败: ${error instanceof Error ? error.message : '未知错误'}`);
+
+      // 处理不同类型的错误
+      let errorMessage = '分析失败，请重试';
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = '请求超时，请稍后重试';
+        } else {
+          errorMessage = `分析失败: ${error.message}`;
+        }
+      }
+
+      alert(errorMessage);
       setIsAnalyzing(false);
       setCurrentAgent(null);
       setPanelState('ideas');

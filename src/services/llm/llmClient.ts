@@ -1,4 +1,6 @@
 import { llmConfig } from '../../config/llm.config';
+import { llmCache } from '../../utils/llmCache';
+import { llmConcurrencyController } from '../../utils/concurrencyControl';
 
 export interface LLMResponse {
   content: string;
@@ -79,8 +81,25 @@ export class LLMClient {
     }
   }
 
+  /**
+   * 非流式调用（带缓存和并发控制）
+   */
   async call(prompt: string, options?: { temperature?: number; maxTokens?: number }): Promise<string> {
-    const response = await this.callWithRetry(prompt, options);
+    // 1. 检查缓存
+    const cached = llmCache.get(prompt, options || {});
+    if (cached) {
+      console.log('⚡ Cache hit, returning cached response');
+      return cached;
+    }
+
+    // 2. 使用并发控制执行API调用
+    const response = await llmConcurrencyController.run(async () => {
+      return await this.callWithRetry(prompt, options);
+    });
+
+    // 3. 写入缓存
+    llmCache.set(prompt, options || {}, response.content);
+
     return response.content;
   }
 
@@ -112,6 +131,13 @@ export class LLMClient {
       stream: true, // 尝试启用流式
     };
 
+    // 创建AbortController用于超时控制
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.warn('⏰ Stream timeout after 180s');
+      abortController.abort();
+    }, 180000); // 增加到180秒（3分钟）
+
     try {
       const response = await fetch(apiEndpoint, {
         method: 'POST',
@@ -121,7 +147,7 @@ export class LLMClient {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(120000),
+        signal: abortController.signal,
       });
 
       if (!response.ok) {
@@ -163,10 +189,14 @@ export class LLMClient {
     } catch (error: any) {
       console.error('💥 Stream call failed:', {
         error: error.message,
+        name: error.name,
         endpoint: apiEndpoint,
         model: llmConfig.model,
       });
       throw error;
+    } finally {
+      // 清除超时定时器
+      clearTimeout(timeoutId);
     }
   }
 
@@ -184,16 +214,17 @@ export class LLMClient {
     let eventCount = 0;
     let yieldCount = 0;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        console.log('✅ Stream completed:', { eventCount, yieldCount });
-        break;
-      }
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          console.log('✅ Stream completed:', { eventCount, yieldCount });
+          break;
+        }
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
       for (const line of lines) {
         if (line.trim() === '') continue;
@@ -242,6 +273,19 @@ export class LLMClient {
           console.warn('Failed to parse SSE line:', line.substring(0, 100));
         }
       }
+    }
+    } catch (error: any) {
+      // 流读取过程中的错误
+      console.error('💥 Stream reading failed:', {
+        error: error.message,
+        name: error.name,
+        eventCount,
+        yieldCount,
+      });
+      throw error;
+    } finally {
+      // 确保释放reader
+      reader.releaseLock();
     }
   }
 

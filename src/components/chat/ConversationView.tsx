@@ -86,7 +86,7 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
       {/* 中间：消息流 */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4"
+        className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6"
       >
         {/* AI生成的报告作为第一条消息 */}
         <div className="flex gap-3">
@@ -171,7 +171,49 @@ export const ConversationView: React.FC<ConversationViewProps> = ({
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex-1 px-4 py-3 rounded-2xl bg-[#1A2235] border border-white/5 max-w-[85%]">
-                  <p className="text-sm text-slate-200 whitespace-pre-wrap">{msg.content}</p>
+                  <div className="prose prose-sm prose-invert max-w-none">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                      components={{
+                        h1: ({ node, ...props }) => (
+                          <h1 className="text-lg font-bold text-indigo-200 mb-2 mt-3 first:mt-0" {...props} />
+                        ),
+                        h2: ({ node, ...props }) => (
+                          <h2 className="text-base font-semibold text-indigo-300 mb-2 mt-3" {...props} />
+                        ),
+                        h3: ({ node, ...props }) => (
+                          <h3 className="text-sm font-medium text-slate-200 mb-1 mt-2" {...props} />
+                        ),
+                        p: ({ node, ...props }) => (
+                          <p className="text-sm text-slate-300 leading-relaxed mb-2" {...props} />
+                        ),
+                        ul: ({ node, ...props }) => (
+                          <ul className="list-disc list-outside ml-4 mb-2 space-y-1" {...props} />
+                        ),
+                        ol: ({ node, ...props }) => (
+                          <ol className="list-decimal list-outside ml-4 mb-2 space-y-1" {...props} />
+                        ),
+                        li: ({ node, ...props }) => (
+                          <li className="text-sm text-slate-300" {...props} />
+                        ),
+                        code: ({ node, inline, ...props }: any) =>
+                          inline ? (
+                            <code className="bg-slate-800 text-pink-300 px-1 py-0.5 rounded text-xs font-mono" {...props} />
+                          ) : (
+                            <code className="block bg-slate-900 p-2 rounded text-xs font-mono overflow-x-auto my-2" {...props} />
+                          ),
+                        pre: ({ node, ...props }) => (
+                          <pre className="bg-slate-900 rounded overflow-hidden my-2" {...props} />
+                        ),
+                        strong: ({ node, ...props }) => (
+                          <strong className="font-bold text-indigo-300" {...props} />
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </>
             ) : (
