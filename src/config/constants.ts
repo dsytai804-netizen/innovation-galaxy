@@ -69,3 +69,34 @@ export const BREAKPOINTS = {
   LAPTOP: 1280,
   MIN_SUPPORTED: 1280,
 };
+
+// 手势控制配置
+export const GESTURE_CONFIG = {
+  // MediaPipe 配置
+  DETECTION_FPS: 30,
+  MIN_DETECTION_CONFIDENCE: 0.7,
+  MIN_TRACKING_CONFIDENCE: 0.5,
+
+  // 平滑参数
+  EMA_ALPHA: 0.15, // 指数移动平均权重（越小越平滑）
+  LOWPASS_CUTOFF: 0.08, // 低通滤波截止频率
+  DEADZONE_THRESHOLD: 0.008, // 死区阈值（增大以提高稳定性，便于切换手势）
+
+  // 手势识别阈值
+  PINCH_THRESHOLD: 0.05, // 捏合距离阈值
+  FIST_DISTANCE_THRESHOLD: 0.20, // 握拳距离阈值（放宽以便识别）
+  FINGER_EXTEND_THRESHOLD: 0.05, // 手指伸展阈值
+  GESTURE_STABLE_FRAMES: 5, // 手势稳定帧数（增加到5帧）
+  HAND_LOST_FRAMES: 30, // 手部丢失超时
+
+  // 控制灵敏度
+  ROTATION_SENSITIVITY: 1.5, // 旋转灵敏度（降低灵敏度）
+  PAN_SENSITIVITY: 25.0, // 平移灵敏度（大幅提高以增强平移效果）
+  ZOOM_SENSITIVITY: 50.0, // 缩放灵敏度（大幅提高以减少移动幅度）
+
+  // 摄像头配置
+  CAMERA_WIDTH: 640,
+  CAMERA_HEIGHT: 480,
+  PREVIEW_WIDTH: 240,
+  PREVIEW_HEIGHT: 180,
+} as const;

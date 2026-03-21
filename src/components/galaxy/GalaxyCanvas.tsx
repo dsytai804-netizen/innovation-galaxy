@@ -5,15 +5,19 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useGraphStore } from '../../stores/useGraphStore';
 import { useControlStore } from '../../stores/useControlStore';
+import { useGestureStore } from '../../stores/useGestureStore';
 import { Planet } from './Planet';
 import { ConnectionLine } from './ConnectionLine';
 import { ParticleField } from './ParticleField';
+import { GestureController } from '../gesture/GestureController';
+import { GestureCameraView } from '../gesture/GestureCameraView';
 
 export const GalaxyCanvas: React.FC = () => {
   const loadInitialGraph = useGraphStore((state) => state.loadInitialGraph);
   const nodes = useGraphStore((state) => state.nodes);
   const edges = useGraphStore((state) => state.edges);
   const controlMode = useControlStore((state) => state.controlMode);
+  const isGestureActive = useGestureStore((state) => state.isActive);
 
   useEffect(() => {
     loadInitialGraph();
@@ -60,6 +64,7 @@ export const GalaxyCanvas: React.FC = () => {
 
         {/* Controls - 类似VR看房的交互体验 */}
         <OrbitControls
+          enabled={!isGestureActive}
           enableDamping
           dampingFactor={0.05}
           rotateSpeed={0.6}
@@ -101,6 +106,9 @@ export const GalaxyCanvas: React.FC = () => {
           zoomToCursor={false}
         />
 
+        {/* Gesture Controller */}
+        {isGestureActive && <GestureController />}
+
         {/* Post-processing Effects */}
         <EffectComposer>
           <Bloom
@@ -111,6 +119,9 @@ export const GalaxyCanvas: React.FC = () => {
           />
         </EffectComposer>
       </Canvas>
+
+      {/* Gesture Camera View (outside Canvas) */}
+      <GestureCameraView />
     </div>
   );
 };

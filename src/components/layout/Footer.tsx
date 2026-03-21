@@ -1,6 +1,7 @@
 import React from 'react';
 import { MoveVertical, MousePointer2, Search, Sparkles, Move, Rotate3D } from 'lucide-react';
 import { useControlStore } from '../../stores/useControlStore';
+import { GestureButton } from '../gesture/GestureButton';
 
 export const Footer: React.FC = () => {
   const { controlMode, toggleControlMode } = useControlStore();
@@ -84,6 +85,9 @@ export const Footer: React.FC = () => {
             </>
           )}
         </button>
+
+        {/* Gesture Control Button */}
+        <GestureButton />
       </div>
     </div>
   );

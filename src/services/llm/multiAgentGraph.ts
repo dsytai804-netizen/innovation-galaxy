@@ -81,10 +81,10 @@ export class MultiAgentGraph {
       techAnalysis
     );
 
-    // 流式生成报告 - 增加maxTokens到8000确保完整输出
+    // 流式生成报告 - 优化maxTokens提升响应速度
     for await (const chunk of langChainClient.callStream(prompt, {
       temperature: 0.6,
-      maxTokens: 8000,  // 🔧 从3000增加到8000
+      maxTokens: 4000,  // 从8000降低到4000以提升速度
     })) {
       this.onProgress?.('orchestrator', chunk);
       yield chunk;

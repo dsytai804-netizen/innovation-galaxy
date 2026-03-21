@@ -31,7 +31,7 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
     }
   });
 
-  // Click handler - expand/collapse node with delay to distinguish from double click
+  // Click handler - expand/collapse node with streaming
   const handleClick = async (e: any) => {
     e.stopPropagation();
 
@@ -53,15 +53,21 @@ export const Planet: React.FC<PlanetProps> = ({ node }) => {
         return;
       }
 
-      // Otherwise, expand it
+      // Otherwise, expand it with streaming
       try {
         setIsExpanding(true);
-        console.log('Expanding node:', node.label);
+        console.log('Streaming expansion for node:', node.label);
 
-        const children = await nodeExpansionService.expandNode(node);
-        expandNode(node.id, children);
+        let allChildren: GraphNode[] = [];
 
-        console.log(`Expanded ${node.label} with ${children.length} children`);
+        // 使用流式渲染
+        for await (const newNodes of nodeExpansionService.expandNodeStream(node)) {
+          // 立即添加新生成的节点
+          expandNode(node.id, [...allChildren, ...newNodes]);
+          allChildren = [...allChildren, ...newNodes];
+        }
+
+        console.log(`Expanded ${node.label} with ${allChildren.length} children`);
       } catch (error) {
         console.error('Failed to expand node:', error);
         alert('节点扩展失败，请检查LLM API配置');
