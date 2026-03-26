@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sparkles, MousePointer2, HelpCircle, PanelRightOpen } from 'lucide-react';
+import { AboutModal } from '../about/AboutModal';
 
 interface HeaderProps {
   onTogglePanel: () => void;
@@ -7,8 +8,10 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onTogglePanel, isPanelCollapsed }) => {
+  const [showAbout, setShowAbout] = useState(false);
   return (
-    <header className="h-[60px] flex-shrink-0 flex items-center justify-between px-6 border-b border-white/10 bg-[#0B0F19] z-20 sticky top-0">
+    <>
+      <header className="h-[60px] flex-shrink-0 flex items-center justify-between px-6 border-b border-white/10 bg-[#0B0F19] z-20 sticky top-0">
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
           <Sparkles className="w-4 h-4 text-white" />
@@ -39,10 +42,12 @@ export const Header: React.FC<HeaderProps> = ({ onTogglePanel, isPanelCollapsed 
             </>
           )}
         </button>
-        <button className="flex items-center gap-1.5 hover:text-white transition-colors" data-cursor="interactive">
+        <button onClick={() => setShowAbout(true)} className="flex items-center gap-1.5 hover:text-white transition-colors" data-cursor="interactive">
           <HelpCircle className="w-4 h-4" /> 帮助
         </button>
       </div>
     </header>
+    {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+    </>
   );
 };

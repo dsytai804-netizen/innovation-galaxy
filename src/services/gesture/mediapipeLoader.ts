@@ -34,16 +34,13 @@ export async function loadMediaPipe(): Promise<HandLandmarker> {
   loadError = null;
 
   try {
-    // Load WASM files from CDN
-    const vision = await FilesetResolver.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
-    );
+    // Load WASM files from local public directory
+    const vision = await FilesetResolver.forVisionTasks('/mediapipe-wasm');
 
     // Create HandLandmarker with optimized config
     handLandmarker = await HandLandmarker.createFromOptions(vision, {
       baseOptions: {
-        modelAssetPath:
-          'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+        modelAssetPath: '/models/hand_landmarker.task',
         delegate: 'GPU', // Enable GPU acceleration
       },
       runningMode: 'VIDEO',

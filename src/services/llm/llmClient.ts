@@ -292,9 +292,18 @@ export class LLMClient {
   async callJSON<T = any>(prompt: string, options?: { temperature?: number; maxTokens?: number }): Promise<T> {
     const content = await this.call(prompt, options);
 
-    // Extract JSON from markdown code blocks if present
-    const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/```\n?([\s\S]*?)\n?```/);
-    const jsonString = jsonMatch ? jsonMatch[1] : content;
+    // Step 1: try to extract from markdown code blocks
+    const codeBlockMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/```\n?([\s\S]*?)\n?```/);
+    let jsonString = codeBlockMatch ? codeBlockMatch[1] : content;
+
+    // Step 2: if no code blocks, extract the outermost JSON object or array
+    // (handles cases where LLM adds preamble/postamble text around the JSON)
+    if (!codeBlockMatch) {
+      const objectMatch = jsonString.match(/\{[\s\S]*\}/);
+      const arrayMatch = jsonString.match(/\[[\s\S]*\]/);
+      if (objectMatch) jsonString = objectMatch[0];
+      else if (arrayMatch) jsonString = arrayMatch[0];
+    }
 
     try {
       return JSON.parse(jsonString.trim());
